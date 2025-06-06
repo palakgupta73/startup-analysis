@@ -20,7 +20,6 @@ def load_investor_details(investor):
     with col1:
         big_series=df[df['investors'].str.contains(investor)].groupby('startup')['amount'].sum().sort_values(ascending=False).head()
         st.subheader('Biggest Investments')
-        #st.dataframe(big_series)
         fig, ax= plt.subplots()
         ax.bar(big_series.index,big_series.values)
         st.pyplot(fig)
@@ -60,18 +59,18 @@ def load_investor_details(investor):
 
     st.subheader('Similar Investments by Other Investors')
 
-    # Step 1: Get the verticals this investor invested in
+    # Get the verticals 
     investor_verticals = df[df['investors'].str.contains(investor)]['vertical'].unique()
     investor_subverticals = df[df['investors'].str.contains(investor)]['subvertical'].unique() if 'subvertical' in df.columns else []
 
-    # Step 2: Get records from other investors in the same verticals
+    # Get records from other investors in the same verticals
     similar_investments = df[
         (~df['investors'].str.contains(investor)) & 
         ((df['vertical'].isin(investor_verticals)) | 
          (df['subvertical'].isin(investor_subverticals) if 'subvertical' in df.columns else False))
     ]
 
-    # Step 3: Show similar investments
+    # Show similar investments
     if not similar_investments.empty:
         st.dataframe(similar_investments[['startup', 'vertical', 'subvertical', 'investors', 'city', 'round', 'amount']].drop_duplicates().reset_index(drop=True), use_container_width=True)
     else:
@@ -81,9 +80,6 @@ def load_investor_details(investor):
 def load_startup_details(startup):
     st.title(startup)
 
-    # Filter the data for the selected startup
-    
-    
     # Filter data for the selected startup
     st_df = df[df['startup'].str.lower() == startup.lower()]
 
@@ -175,7 +171,7 @@ def load_overall_details():
     total=round(df['amount'].sum())
     with col1:
         st.metric('Total',str (total) + 'Cr')
-    #Maximum amount infused in a startu
+    #Maximum amount infused in a startup
     max_amount=df.groupby('startup')['amount'].max().sort_values(ascending=False).head(1).values[0]
     with col2:
         st.metric('Maximum amount infused in a startup',max_amount)
@@ -218,12 +214,10 @@ def load_overall_details():
     temp_df['x-axis']=temp_df['month'].astype('str') + '-' + temp_df['year'].astype('str')
     fig5,ax5=plt.subplots()
     ax5.set_title('MoM graph for all the years')
-    #ax5.plot(temp_df['x-axis'],)
     
     ax5.set_xticks(range(len(temp_df['amount'])))
     ax5.set_xticklabels(temp_df['x-axis'], rotation=90,fontsize=6)
     ax5.plot(temp_df['amount'])
-    #plt.show()  
     st.pyplot(fig5)
     
 
@@ -240,14 +234,14 @@ def load_overall_details():
 
     with col6:
         sector_sum = df.groupby('vertical')['amount'].sum().sort_values(ascending=False).head(10)
-        fig2, ax2 = plt.subplots(figsize=(10, 6.5))  # Optional: adjust size
+        fig2, ax2 = plt.subplots(figsize=(10, 6.5)) 
 
         # Plot vertical bars (x: sectors, y: total funding)
         ax2.bar(sector_sum.index, sector_sum.values, color='steelblue')
         ax2.set_title('Top Sectors (by Total Funding)')
         ax2.set_xlabel('Sector')
         ax2.set_ylabel('Total Funding (Cr)')
-        plt.xticks(rotation=45, ha='right')  # Rotate x-axis labels for readability
+        plt.xticks(rotation=45, ha='right')  
 
         st.pyplot(fig2)
 
